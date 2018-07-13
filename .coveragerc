@@ -1,0 +1,3 @@
+[run]
+source = wedding_gallery
+omit = wedding_gallery/test*
