@@ -1,33 +1,47 @@
+from os.path import basename
+
+from pyramid.httpexceptions import HTTPFound
 from pyramid.response import Response
 from pyramid.view import view_config
 
-from sqlalchemy.exc import DBAPIError
+from wedding_gallery.models.photo import Photo
+from wedding_gallery.s3 import S3Sevice
 
-from ..models import MyModel
-
-
-@view_config(route_name='home', renderer='../templates/mytemplate.jinja2')
-def my_view(request):
-    try:
-        query = request.dbsession.query(MyModel)
-        one = query.filter(MyModel.name == 'one').first()
-    except DBAPIError:
-        return Response(db_err_msg, content_type='text/plain', status=500)
-    return {'one': one, 'project': 'wedding_gallery'}
+FILE_FORMATS = ('jpeg', 'jpg', 'png', 'bmp')
 
 
-db_err_msg = """\
-Pyramid is having a problem using your SQL database.  The problem
-might be caused by one of the following things:
+class PhotoView:
+    def __init__(self, request):
+        self.request = request
 
-1.  You may need to run the "initialize_wedding_gallery_db" script
-    to initialize your database tables.  Check your virtual
-    environment's "bin" directory for this script and try to run it.
+    @view_config(route_name='upload_photo',
+                 renderer='../templates/upload.jinja2', request_method='GET')
+    def create(self):
+        return {'project': 'weding_gallery'}
 
-2.  Your database server may not be running.  Check that the
-    database server referred to by the "sqlalchemy.url" setting in
-    your "development.ini" file is running.
+    @view_config(route_name='save_photo', request_method='POST')
+    def save(self):
+        # make sure that filename not contain full path
+        filename = basename(self.request.POST['photo'].filename)
 
-After you fix the problem, please restart the Pyramid application to
-try it again.
-"""
+        #checking file format:
+        format_ok = self.check_file_format(filename)
+
+        if not format_ok:
+            print("Aqui")
+            return HTTPFound(location='/upload')
+
+        input_file = self.request.POST['photo'].file
+        print(self.request.POST['photo'].filename)
+        description = self.request.POST['description']
+        u2id = S3Sevice.save(input_file, filename)
+        photo = Photo(name=filename, uuid=str(u2id),
+                      description=description, likes=0)
+        self.request.dbsession.add(photo)
+        return HTTPFound(location='/upload')
+
+    def check_file_format(self, filename):
+        filename_splitted = filename.split('.')
+        if len(filename_splitted) == 2 and filename_splitted[1].lower() in FILE_FORMATS:
+            return True
+        return False
