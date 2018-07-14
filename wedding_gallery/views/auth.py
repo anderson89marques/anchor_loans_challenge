@@ -38,7 +38,7 @@ class AuthView:
             login=login,
         )
 
-    @view_config(route_name='logout')
+    @view_config(route_name='logout', permission='registered')
     def logout(self):
         log.debug("logout")
         headers = forget(self.request)
