@@ -16,11 +16,11 @@ class PhotoView:
         self.session = request.session
 
     @view_config(route_name='upload_photo',
-                 renderer='../templates/upload.jinja2', request_method='GET')
+                 renderer='../templates/upload.jinja2', request_method='GET', permission='admin')
     def create(self):
         return {'project': 'weding_gallery'}
 
-    @view_config(route_name='save_photo', request_method='POST')
+    @view_config(route_name='save_photo', request_method='POST', permission='registered')
     def save(self):
         # make sure that filename not contain full path
         filename = basename(self.request.POST['photo'].filename)

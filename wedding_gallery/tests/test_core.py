@@ -16,10 +16,10 @@ class BaseTest(unittest.TestCase):
             'secret': 'seekrit',
             'auth.secret': 'authseekrit',
         })
-        self.config.include('.models')
+        self.config.include('wedding_gallery.models')
         settings = self.config.get_settings()
 
-        from .models import (
+        from wedding_gallery.models import (
             get_engine,
             get_session_factory,
             get_tm_session,
@@ -31,11 +31,11 @@ class BaseTest(unittest.TestCase):
         self.session = get_tm_session(session_factory, transaction.manager)
 
     def init_database(self):
-        from .models.meta import Base
+        from wedding_gallery.models.meta import Base
         Base.metadata.create_all(self.engine)
 
     def tearDown(self):
-        from .models.meta import Base
+        from wedding_gallery.models.meta import Base
 
         testing.tearDown()
         transaction.abort()
@@ -48,7 +48,7 @@ class TestPhotoSave(BaseTest):
         super(TestPhotoSave, self).setUp()
         self.init_database()
 
-        from .models import Photo
+        from wedding_gallery.models import Photo
         from uuid import uuid4
 
         photo = Photo(name='anderson.jpg',
@@ -58,7 +58,7 @@ class TestPhotoSave(BaseTest):
         self.session.add(photo)
 
     def test_save_photo(self):
-        from .models import Photo
+        from wedding_gallery.models import Photo
         self.assertTrue(self.session.query(Photo).count())
 
 
@@ -84,18 +84,18 @@ class TestUserSave(BaseTest):
         super(TestUserSave, self).setUp()
         self.init_database()
 
-        from .models import User
+        from wedding_gallery.models import User
 
         user = User(name='husband', role='admin')
         user.set_password('admin')
         self.session.add(user)
 
     def makeUser(self, name, role):
-        from .models import User
+        from wedding_gallery.models import User
         return User(name=name, role=role)
 
     def test_save_user(self):
-        from .models import User
+        from wedding_gallery.models import User
         self.assertTrue(self.session.query(User).count())
 
     def test_password_hash_not_set(self):
@@ -145,7 +145,7 @@ class AuthFunctionalViewTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         from wedding_gallery.models.meta import Base
-        from .models import (
+        from wedding_gallery.models import (
             get_engine,
             get_session_factory,
             get_tm_session,
@@ -169,7 +169,7 @@ class AuthFunctionalViewTest(unittest.TestCase):
 
         with transaction.manager:
             dbsession = get_tm_session(session_factory, transaction.manager)
-            from .models import User
+            from wedding_gallery.models import User
             user = User(name='usuario', role='basic')
             user.set_password('basic')
             dbsession.add(user)

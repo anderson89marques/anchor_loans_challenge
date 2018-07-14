@@ -22,6 +22,9 @@
                 </button>
                 <div class="collapse navbar-collapse" id="mainMenu">
                     {% if request.user %}
+                        <form class="form-inline">
+                            <a href="{{request.route_url('upload_photo')}}" class="btn btn-outline-secondary">upload</a>
+                        </form>
                         <ul class="navbar-nav ml-auto">
                             <li class="nav-item">
                               <a class="nav-link dropdown-toggle" href="#" id="userMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
