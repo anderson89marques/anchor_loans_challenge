@@ -6,3 +6,4 @@ def includeme(config):
     config.add_route('upload_photo', '/upload')
     config.add_route('save_photo', '/upload_save')
     config.add_route('show_photos', '/')
+    config.add_route('register', '/register')
