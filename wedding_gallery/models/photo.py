@@ -1,16 +1,11 @@
-from sqlalchemy import (
-    Column,
-    Index,
-    Integer,
-    Text,
-    Boolean,
-)
+from sqlalchemy import Boolean, Column, Integer, Text
 
 from .meta import Base
 
 
 class Photo(Base):
-    __tablename__ = 'photo'
+    """ The SQLAlchemy declarative model class for a Photo object. """
+    __tablename__ = 'photos'
     id = Column(Integer, primary_key=True)
     uuid = Column(Text)
     name = Column(Text)

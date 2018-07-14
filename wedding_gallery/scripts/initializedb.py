@@ -1,21 +1,12 @@
 import os
 import sys
+
 import transaction
-
-from pyramid.paster import (
-    get_appsettings,
-    setup_logging,
-    )
-
+from pyramid.paster import get_appsettings, setup_logging
 from pyramid.scripts.common import parse_vars
 
+from ..models import User, get_engine, get_session_factory, get_tm_session
 from ..models.meta import Base
-from ..models import (
-    get_engine,
-    get_session_factory,
-    get_tm_session,
-    )
-from ..models import Photo
 
 
 def usage(argv):
@@ -38,8 +29,12 @@ def main(argv=sys.argv):
 
     session_factory = get_session_factory(engine)
 
-    #with transaction.manager:
-    #    dbsession = get_tm_session(session_factory, transaction.manager)
-#
-    #    model = MyModel(name='one', value=1)
-    #    dbsession.add(model)
+    with transaction.manager:
+        dbsession = get_tm_session(session_factory, transaction.manager)
+        user = User(name='husband', role='admin')
+        user.set_password('admin')
+        dbsession.add(user)
+
+        user = User(name='wife', role='admin')
+        user.set_password('admin')
+        dbsession.add(user)
