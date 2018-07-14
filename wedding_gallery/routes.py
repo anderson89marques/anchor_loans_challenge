@@ -7,3 +7,5 @@ def includeme(config):
     config.add_route('save_photo', '/upload_save')
     config.add_route('show_photos', '/')
     config.add_route('register', '/register')
+    config.add_route('login', '/login')
+    config.add_route('logout', '/logout')

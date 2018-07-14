@@ -1,6 +1,7 @@
 import unittest
 
 import transaction
+import webtest
 from pyramid import testing
 
 
@@ -11,7 +12,9 @@ def dummy_request(dbsession):
 class BaseTest(unittest.TestCase):
     def setUp(self):
         self.config = testing.setUp(settings={
-            'sqlalchemy.url': 'sqlite:///:memory:'
+            'sqlalchemy.url': 'sqlite:///:memory:',
+            'secret': 'seekrit',
+            'auth.secret': 'authseekrit',
         })
         self.config.include('.models')
         settings = self.config.get_settings()
@@ -122,7 +125,7 @@ class UserViewTest(BaseTest):
                                              'password': 'secret',
                                              'confirm': 'secret'},
                                        dbsession=self.session)
-        inst = UserView(request)                                       
+        inst = UserView(request)
         response = inst.register()
         self.assertEqual(response.location, '/')
 
@@ -136,3 +139,56 @@ class UserViewTest(BaseTest):
         inst = UserView(request)
         response = inst.register()
         self.assertEqual(response.location, '/register')
+
+
+class AuthFunctionalViewTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        from wedding_gallery.models.meta import Base
+        from .models import (
+            get_engine,
+            get_session_factory,
+            get_tm_session,
+            User
+        )
+        from wedding_gallery import main
+
+        settings = {
+            'sqlalchemy.url': 'sqlite:///:memory:',
+            'secret': 'seekrit',
+            'auth.secret': 'authseekrit',
+        }
+
+        app = main({}, **settings)
+        cls.testapp = webtest.TestApp(app)
+
+        session_factory = app.registry['dbsession_factory']
+        cls.engine = session_factory.kw['bind']
+        Base.metadata.create_all(bind=cls.engine)
+        cls.dbsession = get_tm_session(session_factory, transaction.manager)
+
+        with transaction.manager:
+            dbsession = get_tm_session(session_factory, transaction.manager)
+            from .models import User
+            user = User(name='usuario', role='basic')
+            user.set_password('basic')
+            dbsession.add(user)
+
+    @classmethod
+    def tearDownClass(cls):
+        from wedding_gallery.models.meta import Base
+        Base.metadata.drop_all(bind=cls.engine)
+
+    def test_login_page(self):
+        resp = self.testapp.get('/login', status=200)
+        self.assertIn(b'Login', resp.body)
+
+    def test_successful_login(self):
+        resp = self.testapp.post('/login', params={'login': 'usuario', 'password': 'basic'},
+                                 status=302)
+        self.assertEqual(resp.location, 'http://localhost/')
+
+    def test_failed_login(self):
+        resp = self.testapp.post('/login', params={'login': 'usuario', 'password': 'incorrect'},
+                                 status=200)
+        self.assertEqual(resp.location, None)
