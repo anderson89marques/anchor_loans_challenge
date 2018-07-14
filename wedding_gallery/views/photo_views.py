@@ -40,6 +40,14 @@ class PhotoView:
         self.request.dbsession.add(photo)
         return HTTPFound(location='/upload')
 
+    @view_config(route_name='show_photo',
+                 renderer='../templates/mytemplate.jinja2', request_method='GET')
+    def show_photo(self):
+        dbsession = self.request.dbsession
+        photos = dbsession.query(Photo).all()
+        print(f"PHOTOS: {photos[0]}")
+        return {"uuid": photos[0].uuid}
+
     def check_file_format(self, filename):
         filename_splitted = filename.split('.')
         if len(filename_splitted) == 2 and filename_splitted[1].lower() in FILE_FORMATS:
