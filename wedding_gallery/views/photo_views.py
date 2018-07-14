@@ -44,13 +44,14 @@ class PhotoView:
             f"Photo {filename} is uploaded successfully.", queue='success')
         return HTTPFound(location='/upload')
 
-    @view_config(route_name='show_photo',
-                 renderer='../templates/mytemplate.jinja2', request_method='GET')
-    def show_photo(self):
+    @view_config(route_name='show_photos',
+                 renderer='../templates/home.jinja2', request_method='GET')
+    def show_photos(self):
         dbsession = self.request.dbsession
         photos = dbsession.query(Photo).all()
-        print(f"PHOTOS: {photos[0]}")
-        return {"uuid": photos[0].uuid}
+        for photo in photos:
+            print(f"PHOTO: {photo}")
+        return {"photos": photos}
 
     def check_file_format(self, filename):
         filename_splitted = filename.split('.')
