@@ -1,11 +1,50 @@
-<form action="{{ request.route_url('save_photo') }}" method="post" accept-charset="utf-8"
-      enctype="multipart/form-data">
+{% extends 'base.jinja2' %}
 
-    <label for="photo">Mp3</label>
-    <input id="photo" name="photo" type="file" value="" />
+{% block title %}
+    Upload Photo
+{% endblock %}
 
-    <label for="text-area">Description:</label>
-    <textarea name="description" id="text-area" rows="3"></textarea>
+{% block content %}
 
-    <input type="submit" value="submit" />
-</form>
+{% if view.session.peek_flash(queue='error') %}
+    <div class="alert alert-warning fade show" role="alert">
+        {{ view.session.pop_flash(queue='error')[0] }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+{% elif view.session.peek_flash(queue='success') %}
+    <div class="alert alert-success fade show" role="alert">
+        {{ view.session.pop_flash(queue='success')[0] }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+{% endif %}
+
+<div class="row">
+    <div class="col-md-6 offset-md-3 my-4">
+        <div class="card">
+            <div class="card-header">
+                Upload Your Photo
+            </div>
+            <div class="card-body">
+                <form action="/upload_save" method="post" accept-charset="utf-8" enctype="multipart/form-data">
+                    <div style="display: none;">
+                        <input name="csrf_token" type="hidden" value="{{ view.session.get_csrf_token() }}" />
+                    </div>
+                    <div class="form-group">
+                        <label for="photo">Choose photo:</label>
+                        <input type="file" class="form-control-file" id="photo" name="photo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="text-area">Description:</label>
+                        <textarea name="description" class="form-control" id="text-area" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </form> 
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
