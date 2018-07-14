@@ -1,0 +1,11 @@
+<form action="{{ request.route_url('save_photo') }}" method="post" accept-charset="utf-8"
+      enctype="multipart/form-data">
+
+    <label for="photo">Mp3</label>
+    <input id="photo" name="photo" type="file" value="" />
+
+    <label for="text-area">Description:</label>
+    <textarea name="description" id="text-area" rows="3"></textarea>
+
+    <input type="submit" value="submit" />
+</form>

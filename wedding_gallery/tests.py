@@ -1,6 +1,6 @@
 import unittest
-import transaction
 
+import transaction
 from pyramid import testing
 
 
@@ -20,7 +20,7 @@ class BaseTest(unittest.TestCase):
             get_engine,
             get_session_factory,
             get_tm_session,
-            )
+        )
 
         self.engine = get_engine(settings)
         session_factory = get_session_factory(self.engine)
@@ -39,27 +39,36 @@ class BaseTest(unittest.TestCase):
         Base.metadata.drop_all(self.engine)
 
 
-class TestMyViewSuccessCondition(BaseTest):
+class TestPhotoSave(BaseTest):
 
     def setUp(self):
-        super(TestMyViewSuccessCondition, self).setUp()
+        super(TestPhotoSave, self).setUp()
         self.init_database()
 
-        from .models import MyModel
+        from .models import Photo
+        from uuid import uuid4
 
-        model = MyModel(name='one', value=55)
-        self.session.add(model)
+        photo = Photo(name='anderson.jpg',
+                      uuid=str(uuid4()),
+                      description="my photo",
+                      likes=0)
+        self.session.add(photo)
 
-    def test_passing_view(self):
-        from .views.default import my_view
-        info = my_view(dummy_request(self.session))
-        self.assertEqual(info['one'].name, 'one')
-        self.assertEqual(info['project'], 'wedding_gallery')
+    def test_save_photo(self):
+        from .models import Photo
+        self.assertTrue(self.session.query(Photo).count())
 
-
-class TestMyViewFailureCondition(BaseTest):
-
-    def test_failing_view(self):
-        from .views.default import my_view
-        info = my_view(dummy_request(self.session))
-        self.assertEqual(info.status_int, 500)
+class PhotoViewTest(unittest.TestCase):
+    def test_check_file_format_ok(self):
+        from wedding_gallery.views.photo_views import PhotoView
+        request = testing.DummyRequest()
+        inst = PhotoView(request)
+        resp = inst.check_file_format("anderson.jpg")
+        self.assertTrue(resp)
+        
+    def test_check_file_format_invalid(self):
+        from wedding_gallery.views.photo_views import PhotoView
+        request = testing.DummyRequest()
+        inst = PhotoView(request)
+        resp = inst.check_file_format("anderson")
+        self.assertFalse(resp)
