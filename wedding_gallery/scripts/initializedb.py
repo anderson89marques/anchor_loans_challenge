@@ -5,8 +5,8 @@ import transaction
 from pyramid.paster import get_appsettings, setup_logging
 from pyramid.scripts.common import parse_vars
 
-from ..models import User, get_engine, get_session_factory, get_tm_session
-from ..models.meta import Base
+from wedding_gallery.models import User, get_engine, get_session_factory, get_tm_session
+from wedding_gallery.models.meta import Base
 
 
 def usage(argv):
