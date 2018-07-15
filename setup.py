@@ -22,6 +22,7 @@ requires = [
     'waitress',
     'boto3',
     'python_decouple',
+    'paginate',
 ]
 
 tests_require = [

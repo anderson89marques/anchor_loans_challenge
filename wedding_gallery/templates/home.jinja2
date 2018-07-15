@@ -40,7 +40,20 @@
       <span class="sr-only">Next</span>
     </a>
 </div>
-
+{% set url='$page' %}
+<div class="pager">
+    {% set link_attr={"class": "btn small"} %}
+    {% set curpage_attr={"class": "btn primary small disabled"} %}
+    {% set dotdot_attr={"class": "btn small disabled"} %}
+    <!-- Usei o filter com parametro striotags para converter as strings de retorno
+    para tags html-->
+    {% filter striptags %}
+        {{ photos.pager(url=url,format="$link_previous ~2~ $link_next",
+                                                  symbol_previous="«", symbol_next="»",
+                                                 link_attr=link_attr, curpage_attr=curpage_attr,
+                                                 dotdot_attr=dotdot_attr)}}
+    {% endfilter %}
+</div>
 
 <!-- Modal -->
 <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -51,7 +64,6 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
         </div>
     </div>
   </div>
