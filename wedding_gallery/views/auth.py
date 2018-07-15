@@ -13,6 +13,7 @@ class AuthView:
     def __init__(self, request):
         self.request = request
         self.session = request.session
+        self.db = request.dbsession
 
     @view_config(route_name='login', renderer='../templates/login.jinja2')
     def login(self):
@@ -24,8 +25,7 @@ class AuthView:
         if self.request.method == "POST":
             login = self.request.POST['login']
             password = self.request.POST['password']
-            user = self.request.dbsession.query(
-                User).filter_by(name=login).first()
+            user = self.db.query(User).filter_by(name=login).first()
             if user is not None and user.check_password(password):
                 headers = remember(self.request, user.id)
                 return HTTPFound(location=next_url, headers=headers)

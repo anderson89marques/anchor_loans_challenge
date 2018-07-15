@@ -88,14 +88,14 @@ class PhotoViewTest(BaseTest):
 
     def test_check_file_format_ok(self):
         from wedding_gallery.views.photo_views import PhotoView
-        request = testing.DummyRequest()
+        request = testing.DummyRequest(dbsession=self.session)
         inst = PhotoView(request)
         resp = inst.check_file_format("anderson.jpg")
         self.assertTrue(resp)
 
     def test_check_file_format_invalid(self):
         from wedding_gallery.views.photo_views import PhotoView
-        request = testing.DummyRequest()
+        request = testing.DummyRequest(dbsession=self.session)
         inst = PhotoView(request)
         resp = inst.check_file_format("anderson")
         self.assertFalse(resp)
