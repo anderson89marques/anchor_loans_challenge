@@ -1,9 +1,9 @@
+import transaction
 from pyramid.httpexceptions import HTTPFound
 from pyramid.security import remember
 from pyramid.view import view_config
 
 from wedding_gallery.models import User
-import transaction
 
 
 class UserView:
@@ -17,6 +17,7 @@ class UserView:
 
     @view_config(route_name='register', request_method='POST')
     def register(self):
+        """Register a new user"""
         username = self.request.POST['name']
         passwd = self.request.POST['password']
         pswd_confirm = self.request.POST['confirm']
@@ -35,8 +36,8 @@ class UserView:
         user = User(name=username, role='basic')
         user.set_password(passwd)
         self.request.dbsession.add(user)
-        
+
         user = self.request.dbsession.query(
-                User).filter_by(name=username, role='basic').first()
+            User).filter_by(name=username, role='basic').first()
         headers = remember(self.request, user.id)
         return HTTPFound(location='/', headers=headers)
