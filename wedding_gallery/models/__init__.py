@@ -8,6 +8,8 @@ import zope.sqlalchemy
 from .photo import Photo  # flake8: noqa
 from .user import User  # flake8: noqa
 
+from .like import Like   # flake8: noqa
+
 # run configure_mappers after defining all of the models to ensure
 # all relationships can be setup
 configure_mappers()

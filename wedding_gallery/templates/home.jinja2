@@ -2,7 +2,6 @@
 
 {% block stylesheet %}
     {{ super() }}
-    <link href="{{request.static_url('wedding_gallery:static/carrousel.css')}}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -14,11 +13,23 @@
             <div class="card" style="height: 28rem; width: 22rem;">
                 <img class="card-img-top" height="254" width="200" src="{{ request.static_url('wedding_gallery:images/' + photo.uuid )}}" alt="{{photo.name}}" 
                      data-toggle="modal" data-target="#exampleModalCenter" data-whatever="{{ request.static_url('wedding_gallery:images/' + photo.uuid )}}">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <button type="button" class="btn btn-default btn-sm like" id="{{photo.id}}">
+                            {% if request.user.id in photo.likes|map(attribute='user_id') %}
+                                <i class="fas fa-heart"></i>
+                            {% else %}
+                                <i class="far fa-heart"></i>
+                            {%endif%}
+                        </button>
+                        <strong id="like{{photo.id}}">{{photo.likes|length}} like(s)</strong>
+                    </li>
+                </ul>
                 <div class="card-body">
                     <p class="card-text">{{ photo.description }}</p> 
                 </div>
                 <div class="card-footer">
-                    <p class="card-text"><small class="text-muted">uploaded in: 3 mins ago</small></p>
+                    <p class="card-text"><small class="text-muted">uploaded in: {{photo.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small></p>
                 </div>
             </div>
         </div>
@@ -55,29 +66,6 @@
 {% endblock content %}
 
 {% block javascript %}
-    {{ super() }}   
-    <script >    
-        $("#myCarousel").on("slide.bs.carousel", function(e) {
-          var $e = $(e.relatedTarget);
-          var idx = $e.index();
-          var itemsPerSlide = 3;
-          var totalItems = $(".carousel-item").length;
-          if (idx >= totalItems - (itemsPerSlide - 1)) {
-            var it = itemsPerSlide - (totalItems - idx);
-            for (var i = 0; i < it; i++) {
-              // append slides to end
-              if (e.direction == "left") {
-                $(".carousel-item")
-                  .eq(i)
-                  .appendTo(".carousel-inner");
-              } else {
-                $(".carousel-item")
-                  .eq(0)
-                  .appendTo($(this).find(".carousel-inner"));
-              }
-            }
-          }
-        });
-    </script>
+    {{ super() }}
     <script src="{{request.static_url('wedding_gallery:static/js/home.js')}}"></script>
 {% endblock javascript %}
