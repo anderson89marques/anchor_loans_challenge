@@ -58,7 +58,7 @@ class TestPhotoSave(BaseTest):
         photo = Photo(name='anderson.jpg',
                       uuid=str(uuid4()),
                       description="my photo",
-                      likes=0)
+                      total_likes=0)
         photo.creator = user                      
         self.session.add(photo)
 
@@ -82,7 +82,7 @@ class PhotoViewTest(BaseTest):
         photo = Photo(name='anderson.jpg',
                       uuid=str(uuid4()),
                       description="my photo",
-                      likes=0)
+                      total_likes=0)
         photo.creator = user                      
         self.session.add(photo)
 
@@ -103,16 +103,18 @@ class PhotoViewTest(BaseTest):
     def test_show_photos(self):
         from wedding_gallery.views.photo_views import PhotoView
         request = testing.DummyRequest(dbsession=self.session)
+        request.matchdict["page"] = 1
         inst = PhotoView(request)
-        resp = inst.show_photos()
+        resp = inst.photos()
         self.assertTrue('photos' in resp)
         self.assertFalse(resp.get('photos'))
     
     def test_show_photos_tobe_approved(self):
         from wedding_gallery.views.photo_views import PhotoView
         request = testing.DummyRequest(dbsession=self.session)
+        request.matchdict["page"] = 1
         inst = PhotoView(request)
-        resp = inst.show_photos_tobe_approved()
+        resp = inst.photos_tobe_approved()
         self.assertTrue('photos' in resp)
         self.assertTrue(resp.get('photos'))
     

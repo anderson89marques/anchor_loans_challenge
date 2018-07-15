@@ -1,5 +1,8 @@
+from datetime import datetime
+
 import bcrypt
-from sqlalchemy import Column, Integer, Text
+from sqlalchemy import Column, DateTime, Integer, Text
+from sqlalchemy.orm import relationship
 
 from .meta import Base
 
@@ -10,6 +13,8 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Text, nullable=False, unique=True)
     role = Column(Text, nullable=False)
+    likes = relationship('Like', back_populates='user')
+    created_at = Column(DateTime, default=datetime.utcnow)
 
     password_hash = Column(Text)
 
