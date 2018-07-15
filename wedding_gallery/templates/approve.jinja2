@@ -1,0 +1,72 @@
+{% extends "base.jinja2" %}
+
+{% block stylesheet %}
+    {{ super() }}
+{% endblock %}
+
+{% block content %}
+<h1 class="text-center mb-3 home-h1">Approve Photos</h1>
+{% if view.session.peek_flash(queue='error') %}
+    <div class="alert alert-warning fade show" role="alert">
+        {{ view.session.pop_flash(queue='error')[0] }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+{% elif view.session.peek_flash(queue='success') %}
+    <div class="alert alert-success fade show" role="alert">
+        {{ view.session.pop_flash(queue='success')[0] }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+{% endif %}
+{% for photo in photos %}
+    <div class='row'>
+       <div class='col-12'>
+           <div class="card mb-2 border-dark">
+               <div class="card-body p-3">
+                   <div class="row">
+                       <div class="col-2" data-toggle="modal" data-target="#modalApprove" data-whatever="{{ request.static_url('wedding_gallery:images/' + photo.uuid )}}">
+                           <img src="{{ request.static_url('wedding_gallery:images/' + photo.uuid )}}" alt="{{ photo.creator.name }}" class="img-thumbnail rounded">
+                       </div>
+                       <div class="col-10">
+                           <div class="row mb-3">
+                                <div class="col-6">
+                                    <strong class="text-muted"> {{photo.creator.name}}</strong>
+                                </div>
+                           </div>
+                           {{ photo.description }}
+                           <div class="mt-3">
+                                <form action="{{request.route_url('approve_photos')}}" method="post" class="form-inline" >
+                                    <div style="display: none;">
+                                        <input name="photo_id" type="hidden" value="{{ photo.id }}" />
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm">Approve</button>
+                                </form>
+                            </div>
+                       </div>
+                   </div>        
+               </div>
+           </div>
+       </div>
+    </div>
+{% endfor %}
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+        <div class="modal-body" style="padding: 0">
+             <img class="card-img" height="440" width="400" src="" alt="imagem">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block javascript %}
+<script src="{{request.static_url('wedding_gallery:static/js/approve.js')}}"></script>
+{% endblock javascript %}

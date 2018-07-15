@@ -48,13 +48,18 @@ class TestPhotoSave(BaseTest):
         super(TestPhotoSave, self).setUp()
         self.init_database()
 
-        from wedding_gallery.models import Photo
+        from wedding_gallery.models import Photo, User
         from uuid import uuid4
+
+        user = User(name='husband', role='admin')
+        user.set_password('admin')
+        self.session.add(user)
 
         photo = Photo(name='anderson.jpg',
                       uuid=str(uuid4()),
                       description="my photo",
                       likes=0)
+        photo.creator = user                      
         self.session.add(photo)
 
     def test_save_photo(self):
@@ -62,7 +67,25 @@ class TestPhotoSave(BaseTest):
         self.assertTrue(self.session.query(Photo).count())
 
 
-class PhotoViewTest(unittest.TestCase):
+class PhotoViewTest(BaseTest):
+    def setUp(self):
+        super(PhotoViewTest, self).setUp()
+        self.init_database()
+
+        from wedding_gallery.models import Photo, User
+        from uuid import uuid4
+
+        user = User(name='husband', role='admin')
+        user.set_password('admin')
+        self.session.add(user)
+
+        photo = Photo(name='anderson.jpg',
+                      uuid=str(uuid4()),
+                      description="my photo",
+                      likes=0)
+        photo.creator = user                      
+        self.session.add(photo)
+
     def test_check_file_format_ok(self):
         from wedding_gallery.views.photo_views import PhotoView
         request = testing.DummyRequest()
@@ -76,6 +99,31 @@ class PhotoViewTest(unittest.TestCase):
         inst = PhotoView(request)
         resp = inst.check_file_format("anderson")
         self.assertFalse(resp)
+    
+    def test_show_photos(self):
+        from wedding_gallery.views.photo_views import PhotoView
+        request = testing.DummyRequest(dbsession=self.session)
+        inst = PhotoView(request)
+        resp = inst.show_photos()
+        self.assertTrue('photos' in resp)
+        self.assertFalse(resp.get('photos'))
+    
+    def test_show_photos_tobe_approved(self):
+        from wedding_gallery.views.photo_views import PhotoView
+        request = testing.DummyRequest(dbsession=self.session)
+        inst = PhotoView(request)
+        resp = inst.show_photos_tobe_approved()
+        self.assertTrue('photos' in resp)
+        self.assertTrue(resp.get('photos'))
+    
+    def test_approve_photo(self):
+        from wedding_gallery.views.photo_views import PhotoView
+
+        request = testing.DummyRequest(post={'photo_id': 1},
+                                       dbsession=self.session)
+        inst = PhotoView(request)
+        resp = inst.approve_photo()
+        self.assertEqual(resp.location, '/approve_photos')
 
 
 class TestUserSave(BaseTest):

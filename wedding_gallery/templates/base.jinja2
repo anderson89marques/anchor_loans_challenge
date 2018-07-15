@@ -31,10 +31,12 @@
                                   {{ request.user.name }}
                               </a>
                               <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userMenu">
-                                      <a class="dropdown-item" href="#">My account</a>
-                                      <div class="dropdown-divider"></div>
-                                      <a class="dropdown-item" href="{{request.route_url('logout')}}">Log out</a>
-                                    </div>
+                                    {% if 'role:admin' in request.effective_principals %}
+                                        <a class="dropdown-item" href="{{request.route_url('approve_photos')}}">Approve Photos</a>
+                                        <div class="dropdown-divider"></div>
+                                    {% endif %}
+                                    <a class="dropdown-item" href="{{request.route_url('logout')}}">Log out</a>
+                                </div>
                             </li>
                           </ul>
                     {% else %}

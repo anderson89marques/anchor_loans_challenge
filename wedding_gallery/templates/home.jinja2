@@ -16,14 +16,12 @@
                  {% set ns.class = "" %}
             {% endif %}
             
-            <div class="carousel-item col-md-4 {{ns.class}}">
+            <div class="carousel-item col-md-4 {{ns.class}}" >
                 <div class="card" style="height: 31rem; width: 22rem;">
-                    <img class="card-img-top" height="254" width="200" src="{{ request.static_url('wedding_gallery:images/' + photo.uuid )}}" alt="{{photo.name}}">
+                    <img class="card-img-top" height="254" width="200" src="{{ request.static_url('wedding_gallery:images/' + photo.uuid )}}" alt="{{photo.name}}" 
+                         data-toggle="modal" data-target="#exampleModalCenter" data-whatever="{{ request.static_url('wedding_gallery:images/' + photo.uuid )}}">
                     <div class="card-body">
                         <p class="card-text">{{ photo.description }}</p> 
-                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter" data-whatever="{{ request.static_url('wedding_gallery:images/' + photo.uuid )}}">
-                            open
-                        </button>
                     </div>
                     <div class="card-footer">
                         <p class="card-text"><small class="text-muted">uploaded in: 3 mins ago</small></p>

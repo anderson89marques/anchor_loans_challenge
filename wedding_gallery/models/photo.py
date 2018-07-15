@@ -1,4 +1,5 @@
-from sqlalchemy import Boolean, Column, Integer, Text
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, Text
+from sqlalchemy.orm import relationship
 
 from .meta import Base
 
@@ -10,5 +11,8 @@ class Photo(Base):
     uuid = Column(Text)
     name = Column(Text)
     description = Column(Text)
-    is_aproved = Column(Boolean(create_constraint=False), default=False)
+    is_approved = Column(Boolean(create_constraint=False), default=False)
     likes = Column(Integer)
+
+    creator_id = Column(ForeignKey('users.id'), nullable=False)
+    creator = relationship('User', backref='photos')
