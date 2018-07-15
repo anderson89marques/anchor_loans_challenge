@@ -8,38 +8,22 @@
 {% block content %}
 
 <h1 class="text-center mb-3 home-h1">Wonderfull Moments</h1>
-<div id="myCarousel" class="carousel slide" data-ride="carousel">
-    <div class="carousel-inner row w-100 mx-auto">
-        {% set ns = namespace(class="active") %}
-        {% for photo in photos %}
-            {% if not loop.first %}
-                 {% set ns.class = "" %}
-            {% endif %}
-            
-            <div class="carousel-item col-md-4 {{ns.class}}" >
-                <div class="card" style="height: 31rem; width: 22rem;">
-                    <img class="card-img-top" height="254" width="200" src="{{ request.static_url('wedding_gallery:images/' + photo.uuid )}}" alt="{{photo.name}}" 
-                         data-toggle="modal" data-target="#exampleModalCenter" data-whatever="{{ request.static_url('wedding_gallery:images/' + photo.uuid )}}">
-                    <div class="card-body">
-                        <p class="card-text">{{ photo.description }}</p> 
-                    </div>
-                    <div class="card-footer">
-                        <p class="card-text"><small class="text-muted">uploaded in: 3 mins ago</small></p>
-                    </div>
+<div class="row">
+{% for photo in photos %}
+        <div class="col-4">
+            <div class="card" style="height: 28rem; width: 22rem;">
+                <img class="card-img-top" height="254" width="200" src="{{ request.static_url('wedding_gallery:images/' + photo.uuid )}}" alt="{{photo.name}}" 
+                     data-toggle="modal" data-target="#exampleModalCenter" data-whatever="{{ request.static_url('wedding_gallery:images/' + photo.uuid )}}">
+                <div class="card-body">
+                    <p class="card-text">{{ photo.description }}</p> 
+                </div>
+                <div class="card-footer">
+                    <p class="card-text"><small class="text-muted">uploaded in: 3 mins ago</small></p>
                 </div>
             </div>
-        {% endfor %}       
-    </div>
-
-    <a class="carousel-control-prev" href="#myCarousel" role="button" data-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="sr-only">Previous</span>
-    </a>
-    <a class="carousel-control-next" href="#myCarousel" role="button" data-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="sr-only">Next</span>
-    </a>
-</div>
+        </div>
+{% endfor %}
+</div>  
 {% set url='$page' %}
 <div class="pager">
     {% set link_attr={"class": "btn small"} %}

@@ -7,6 +7,7 @@ def includeme(config):
     config.add_route('upload_photo', '/upload', factory=RootResource)
     config.add_route('save_photo', '/upload_save', factory=RootResource)
     config.add_route('approve_photos', '/approve_photos', factory=RootResource)
+    config.add_route('tobe_approve_photos', '/approve_photos/{page}', factory=RootResource)
     config.add_route('register', '/register')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout', factory=RootResource)

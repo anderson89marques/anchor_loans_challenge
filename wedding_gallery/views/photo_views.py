@@ -57,11 +57,19 @@ class PhotoView:
         print(photos)
         return {"photos": photos}
 
-    @view_config(route_name='approve_photos',
-                 renderer='../templates/approve.jinja2', request_method='GET', permission='admin')
+    @view_config(route_name='approve_photos', request_method='GET', permission='admin')
     def show_photos_tobe_approved(self):
+        return HTTPFound('/approve_photos/1')
+    
+    @view_config(route_name='tobe_approve_photos',
+                 renderer='../templates/approve.jinja2', request_method='GET', permission='admin')
+    def photos_tobe_approved(self):
         dbsession = self.request.dbsession
-        photos = dbsession.query(Photo).filter_by(is_approved=False).all()
+        query = dbsession.query(Photo).filter_by(is_approved=False).all()
+        photos = Page(query, page=int(self.request.matchdict["page"]),
+                      items_per_page=3,
+                      item_count=len(query))
+        print(photos)
         return {"photos": photos}
 
     @view_config(route_name='approve_photos',

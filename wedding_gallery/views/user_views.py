@@ -3,6 +3,7 @@ from pyramid.security import remember
 from pyramid.view import view_config
 
 from wedding_gallery.models import User
+import transaction
 
 
 class UserView:
@@ -31,10 +32,11 @@ class UserView:
             self.session.flash(
                 "A user with this name already registered.", queue='error')
             return HTTPFound(location='/register')
-
         user = User(name=username, role='basic')
         user.set_password(passwd)
         self.request.dbsession.add(user)
-
+        
+        user = self.request.dbsession.query(
+                User).filter_by(name=username, role='basic').first()
         headers = remember(self.request, user.id)
         return HTTPFound(location='/', headers=headers)
