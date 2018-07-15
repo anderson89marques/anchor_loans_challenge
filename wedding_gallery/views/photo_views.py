@@ -16,7 +16,7 @@ class PhotoView:
         self.session = request.session
 
     @view_config(route_name='upload_photo',
-                 renderer='../templates/upload.jinja2', request_method='GET', permission='admin')
+                 renderer='../templates/upload.jinja2', request_method='GET', permission='registered')
     def create(self):
         return {'project': 'weding_gallery'}
 
@@ -24,34 +24,47 @@ class PhotoView:
     def save(self):
         # make sure that filename not contain full path
         filename = basename(self.request.POST['photo'].filename)
-
-        #checking file format:
         format_ok = self.check_file_format(filename)
 
         if not format_ok:
-            print("Aqui")
             self.session.flash("Photo format is invalid.", queue='error')
             return HTTPFound(location='/upload')
 
         input_file = self.request.POST['photo'].file
-        print(self.request.POST['photo'].filename)
         description = self.request.POST['description']
         u2id = S3Sevice.save(input_file, filename)
         photo = Photo(name=filename, uuid=str(u2id),
                       description=description, likes=0)
+        photo.creator = self.request.user
         self.request.dbsession.add(photo)
         self.session.flash(
-            f"Photo {filename} is uploaded successfully.", queue='success')
+            f"Photo {filename} waiting approvement.", queue='success')
         return HTTPFound(location='/upload')
 
     @view_config(route_name='show_photos',
                  renderer='../templates/home.jinja2', request_method='GET')
     def show_photos(self):
         dbsession = self.request.dbsession
-        photos = dbsession.query(Photo).all()
-        for photo in photos:
-            print(f"PHOTO: {photo}")
+        photos = dbsession.query(Photo).filter_by(is_approved=True).all()
         return {"photos": photos}
+
+    @view_config(route_name='approve_photos',
+                 renderer='../templates/approve.jinja2', request_method='GET', permission='admin')
+    def show_photos_tobe_approved(self):
+        dbsession = self.request.dbsession
+        photos = dbsession.query(Photo).filter_by(is_approved=False).all()
+        return {"photos": photos}
+
+    @view_config(route_name='approve_photos',
+                 request_method='POST', permission='admin')
+    def approve_photo(self):
+        photo_id = self.request.POST['photo_id']
+        photo = self.request.dbsession.query(Photo).filter_by(id=photo_id).first()
+        photo.is_approved = True
+        self.request.dbsession.add(photo)
+        self.session.flash(
+            f"Photo approved successfully.", queue='success')
+        return HTTPFound(location='/approve_photos')
 
     def check_file_format(self, filename):
         filename_splitted = filename.split('.')
