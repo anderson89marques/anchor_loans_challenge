@@ -8,39 +8,36 @@
 {% block content %}
 
 <h1 class="text-center mb-3 home-h1">Wonderfull Moments</h1>
-<div id="myCarousel" class="carousel slide" data-ride="carousel">
-    <div class="carousel-inner row w-100 mx-auto">
-        {% set ns = namespace(class="active") %}
-        {% for photo in photos %}
-            {% if not loop.first %}
-                 {% set ns.class = "" %}
-            {% endif %}
-            
-            <div class="carousel-item col-md-4 {{ns.class}}" >
-                <div class="card" style="height: 31rem; width: 22rem;">
-                    <img class="card-img-top" height="254" width="200" src="{{ request.static_url('wedding_gallery:images/' + photo.uuid )}}" alt="{{photo.name}}" 
-                         data-toggle="modal" data-target="#exampleModalCenter" data-whatever="{{ request.static_url('wedding_gallery:images/' + photo.uuid )}}">
-                    <div class="card-body">
-                        <p class="card-text">{{ photo.description }}</p> 
-                    </div>
-                    <div class="card-footer">
-                        <p class="card-text"><small class="text-muted">uploaded in: 3 mins ago</small></p>
-                    </div>
+<div class="row">
+{% for photo in photos %}
+        <div class="col-4">
+            <div class="card" style="height: 28rem; width: 22rem;">
+                <img class="card-img-top" height="254" width="200" src="{{ request.static_url('wedding_gallery:images/' + photo.uuid )}}" alt="{{photo.name}}" 
+                     data-toggle="modal" data-target="#exampleModalCenter" data-whatever="{{ request.static_url('wedding_gallery:images/' + photo.uuid )}}">
+                <div class="card-body">
+                    <p class="card-text">{{ photo.description }}</p> 
+                </div>
+                <div class="card-footer">
+                    <p class="card-text"><small class="text-muted">uploaded in: 3 mins ago</small></p>
                 </div>
             </div>
-        {% endfor %}       
-    </div>
-
-    <a class="carousel-control-prev" href="#myCarousel" role="button" data-slide="prev">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-      <span class="sr-only">Previous</span>
-    </a>
-    <a class="carousel-control-next" href="#myCarousel" role="button" data-slide="next">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-      <span class="sr-only">Next</span>
-    </a>
+        </div>
+{% endfor %}
+</div>  
+{% set url='$page' %}
+<div class="pager">
+    {% set link_attr={"class": "btn small"} %}
+    {% set curpage_attr={"class": "btn primary small disabled"} %}
+    {% set dotdot_attr={"class": "btn small disabled"} %}
+    <!-- Usei o filter com parametro striotags para converter as strings de retorno
+    para tags html-->
+    {% filter striptags %}
+        {{ photos.pager(url=url,format="$link_previous ~2~ $link_next",
+                                                  symbol_previous="«", symbol_next="»",
+                                                 link_attr=link_attr, curpage_attr=curpage_attr,
+                                                 dotdot_attr=dotdot_attr)}}
+    {% endfilter %}
 </div>
-
 
 <!-- Modal -->
 <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -51,7 +48,6 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
         </div>
     </div>
   </div>

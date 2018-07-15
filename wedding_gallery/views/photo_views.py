@@ -1,5 +1,6 @@
 from os.path import basename
 
+from paginate import Page
 from pyramid.httpexceptions import HTTPFound
 from pyramid.response import Response
 from pyramid.view import view_config
@@ -41,25 +42,42 @@ class PhotoView:
             f"Photo {filename} waiting approvement.", queue='success')
         return HTTPFound(location='/upload')
 
-    @view_config(route_name='show_photos',
-                 renderer='../templates/home.jinja2', request_method='GET')
+    @view_config(route_name='show_photos', request_method='GET')
     def show_photos(self):
+        return HTTPFound('/photos/1')
+
+    @view_config(route_name='photos',
+                 renderer='../templates/home.jinja2', request_method='GET')
+    def photos(self):
         dbsession = self.request.dbsession
-        photos = dbsession.query(Photo).filter_by(is_approved=True).all()
+        query = dbsession.query(Photo).filter_by(is_approved=True).all()
+        photos = Page(query, page=int(self.request.matchdict["page"]),
+                      items_per_page=3,
+                      item_count=len(query))
+        print(photos)
         return {"photos": photos}
 
-    @view_config(route_name='approve_photos',
-                 renderer='../templates/approve.jinja2', request_method='GET', permission='admin')
+    @view_config(route_name='approve_photos', request_method='GET', permission='admin')
     def show_photos_tobe_approved(self):
+        return HTTPFound('/approve_photos/1')
+    
+    @view_config(route_name='tobe_approve_photos',
+                 renderer='../templates/approve.jinja2', request_method='GET', permission='admin')
+    def photos_tobe_approved(self):
         dbsession = self.request.dbsession
-        photos = dbsession.query(Photo).filter_by(is_approved=False).all()
+        query = dbsession.query(Photo).filter_by(is_approved=False).all()
+        photos = Page(query, page=int(self.request.matchdict["page"]),
+                      items_per_page=3,
+                      item_count=len(query))
+        print(photos)
         return {"photos": photos}
 
     @view_config(route_name='approve_photos',
                  request_method='POST', permission='admin')
     def approve_photo(self):
         photo_id = self.request.POST['photo_id']
-        photo = self.request.dbsession.query(Photo).filter_by(id=photo_id).first()
+        photo = self.request.dbsession.query(
+            Photo).filter_by(id=photo_id).first()
         photo.is_approved = True
         self.request.dbsession.add(photo)
         self.session.flash(
