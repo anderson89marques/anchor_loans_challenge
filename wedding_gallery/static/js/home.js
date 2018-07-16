@@ -24,6 +24,7 @@ $(document).ready(function() {
             var url = "/likes"
             var posting = $.post( url, t_obj, 'json');
             posting.done(function( data ) {
+                console.log(data.total_likes + " like(s)");
                 strong.text(data.total_likes + " like(s)");   
             });
       });

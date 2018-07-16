@@ -8,6 +8,7 @@
 
 <h1 class="text-center mb-3 home-h1">Wonderfull Moments</h1>
 <div class="row">
+{% if photos %}
 {% for photo in photos %}
         <div class="col-4">
             <div class="card" style="height: 28rem; width: 22rem;">
@@ -35,37 +36,13 @@
         </div>
 {% endfor %}
 </div>  
-{% set url='$page' %}
-<div class="pager">
-    {% set link_attr={"class": "btn small"} %}
-    {% set curpage_attr={"class": "btn primary small disabled"} %}
-    {% set dotdot_attr={"class": "btn small disabled"} %}
-    <!-- Usei o filter com parametro striotags para converter as strings de retorno
-    para tags html-->
-    {% filter striptags %}
-        {{ photos.pager(url=url,format="$link_previous ~2~ $link_next",
-                                                  symbol_previous="«", symbol_next="»",
-                                                 link_attr=link_attr, curpage_attr=curpage_attr,
-                                                 dotdot_attr=dotdot_attr)}}
-    {% endfilter %}
+{% include "page.jinja2" ignore missing %}
+{% else %}
+<div class="jumbotron">
+  <h1 class="display-4">Welcome my friend.</h1>
+  <p class="lead">No one photo was upload or maybe it not approved yet to be shown here. 
+   You can upload a photo clicking in uplod button above in navigation bar.</p>
 </div>
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-    <div class="modal-content">
-        <div class="modal-body" style="padding: 0">
-             <img class="card-img" height="440" width="400" src="" alt="imagem">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        </div>
-    </div>
-  </div>
-</div>
+{% endif %}
+{% include "modal.jinja2"%}
 {% endblock content %}
-
-{% block javascript %}
-    {{ super() }}
-    <script src="{{request.static_url('wedding_gallery:static/js/home.js')}}"></script>
-{% endblock javascript %}

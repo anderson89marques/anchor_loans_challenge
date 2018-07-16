@@ -6,12 +6,7 @@
 
 {% block content %}
 {% if view.session.peek_flash(queue='error') %}
-    <div class="alert alert-warning fade show" role="alert">
-        {{ view.session.pop_flash(queue='error')[0] }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
+    {% include "success.jinja2" ignore missing %}
 {% endif %}
 <div class="row">
     <div class="col-md-6 offset-md-3 my-4">
