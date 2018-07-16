@@ -2,5 +2,4 @@
 set -e
 python setup.py develop
 pip install .
-initialize_wedding_gallery_db production.ini
 gunicorn --paste production.ini
