@@ -6,21 +6,14 @@
 
 {% block content %}
 <h1 class="text-center mb-3 home-h1">Approve Photos</h1>
+
 {% if view.session.peek_flash(queue='error') %}
-    <div class="alert alert-warning fade show" role="alert">
-        {{ view.session.pop_flash(queue='error')[0] }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
+    {% include "success.jinja2" ignore missing %}
 {% elif view.session.peek_flash(queue='success') %}
-    <div class="alert alert-success fade show" role="alert">
-        {{ view.session.pop_flash(queue='success')[0] }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
+    {% include "error.jinja2" ignore missing %}
 {% endif %}
+
+{% if photos %}
 {% for photo in photos %}
     <div class='row'>
        <div class='col-12'>
@@ -52,23 +45,16 @@
        </div>
     </div>
 {% endfor %}
-{% set url='$page' %}
-<div class="pager">
-    {% set link_attr={"class": "btn small"} %}
-    {% set curpage_attr={"class": "btn primary small disabled"} %}
-    {% set dotdot_attr={"class": "btn small disabled"} %}
-    <!-- Usei o filter com parametro striotags para converter as strings de retorno
-    para tags html-->
-    {% filter striptags %}
-        {{ photos.pager(url=url,format="$link_previous ~2~ $link_next",
-                        symbol_previous="«", symbol_next="»",
-                        link_attr=link_attr, curpage_attr=curpage_attr,
-                        dotdot_attr=dotdot_attr)}}
-    {% endfilter %}
+ {% include "page.jinja2" ignore missing %}
+{% else %}
+
+<div class="jumbotron">
+  <h2 class="display-4">No photos to be approved... good job.</h2>
 </div>
+{% endif %}
 
 <!-- Modal -->
-<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+<div class="modal fade" id="modalApprove" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content">
         <div class="modal-body" style="padding: 0">
@@ -82,5 +68,6 @@
 </div>
 {% endblock %}
 {% block javascript %}
+{{ super() }}
 <script src="{{request.static_url('wedding_gallery:static/js/approve.js')}}"></script>
 {% endblock javascript %}

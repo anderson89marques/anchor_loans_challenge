@@ -79,7 +79,7 @@ class PhotoView:
             f"Photo approved successfully.", queue='success')
         return HTTPFound(location='/approve_photos')
 
-    @view_config(route_name='likes', request_method='POST', renderer='json', permission='admin')
+    @view_config(route_name='likes', request_method='POST', renderer='json', permission='registered')
     def likes(self):
         """Like and unlike operation"""
         _id = int(self.request.POST['_id'])
@@ -91,6 +91,7 @@ class PhotoView:
 
         total_likes = self.db.query(Like).filter_by(
             photo_id=_id).count()
+        print(f"TOTAL: {total_likes}")
         return {'total_likes': total_likes}
 
     def check_file_format(self, filename):
